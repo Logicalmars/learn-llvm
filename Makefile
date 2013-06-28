@@ -4,7 +4,7 @@ CONFIG := `llvm-config --cppflags --ldflags --libs core jit native` -rdynamic
 CONFIG1 := `llvm-config --cppflags --ldflags --libs core`
 CONFIG2 := `llvm-config --cppflags --ldflags --libs jit interpreter nativecodegen`
 
-handIR: 
+handIR: manu/handIR.cpp 
 	$(CXX) -O3 manu/handIR.cpp $(CONFIG2) $(IFLAG) -o handIR
 
 toy:	

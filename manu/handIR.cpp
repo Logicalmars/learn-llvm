@@ -45,11 +45,11 @@ static Function *CreateFibFunction(Module *M, LLVMContext &Context) {
     cast<Function>(M->getOrInsertFunction("fib", Type::getInt32Ty(Context),
                                           Type::getInt32Ty(Context),
                                           (Type *)0));
-
+  
   // Add a basic block to the function.
   BasicBlock *BB = BasicBlock::Create(Context, "EntryBlock", FibF);
 
-  // Get pointers to the constants.
+  // Get pointers to the constants.  
   Value *One = ConstantInt::get(Type::getInt32Ty(Context), 1);
   Value *Two = ConstantInt::get(Type::getInt32Ty(Context), 2);
 
@@ -63,7 +63,7 @@ static Function *CreateFibFunction(Module *M, LLVMContext &Context) {
   BasicBlock* RecurseBB = BasicBlock::Create(Context, "recurse", FibF);
 
   // Create the "if (arg <= 2) goto exitbb"
-  Value *CondInst = new ICmpInst(*BB, ICmpInst::ICMP_SLE, ArgX, Two, "cond");
+  Value *CondInst = new ICmpInst(*BB, ICmpInst::ICMP_SLE, ArgX, Two, "cond");  
   BranchInst::Create(RetBB, RecurseBB, CondInst, BB);
 
   // Create: ret int 1
@@ -98,15 +98,15 @@ int main(int argc, char **argv) {
   LLVMContext Context;
 
   // Create some module to put our function into it.
-  OwningPtr<Module> M(new Module("test", Context));
+  OwningPtr<Module> Mptr(new Module("test", Context));
 
   // We are about to create the "fib" function:
-  Function *FibF = CreateFibFunction(M.get(), Context);
+  Function *FibF = CreateFibFunction(Mptr.get(), Context);
 
   // Now we going to create JIT
   std::string errStr;
   ExecutionEngine *EE =
-    EngineBuilder(M.get())
+    EngineBuilder(Mptr.get())
     .setErrorStr(&errStr)
     .setEngineKind(EngineKind::JIT)
     .create();
@@ -118,13 +118,13 @@ int main(int argc, char **argv) {
   }
 
   errs() << "verifying... ";
-  if (verifyModule(*M)) {
+  if (verifyModule(*Mptr)) {
     errs() << argv[0] << ": Error constructing function!\n";
     return 1;
   }
 
   errs() << "OK\n";
-  errs() << "We just constructed this LLVM module:\n\n---------\n" << *M;
+  errs() << "We just constructed this LLVM module:\n\n---------\n" << *Mptr;
   errs() << "---------\nstarting fibonacci(" << n << ") with JIT...\n";
 
   // Call the Fibonacci function with argument n:
