@@ -473,7 +473,7 @@ Function *FunctionAST::Codegen() {
   }
 
   // Error reading body, remove function.
-  TheFunction->eraseFromParent();
+  TheFunction->eraseFromParent();  
   return 0;
 }
 
